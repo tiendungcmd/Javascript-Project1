@@ -125,7 +125,7 @@ function Human(name, height, weight, diet) {
     this.diet = diet;
 }
 // get human data from form
-function GetDataHuman() {
+function getDataHuman() {
     const name = document.getElementById("name").value;
     const weight = document.getElementById("weight").value;
     const feet = document.getElementById("feet").value;
@@ -163,19 +163,24 @@ function humanBox(human) {
                     <img src="images/human.png">`;
     return div;
 }
-// Add tiles to DOM
-function addToDOM() {
-    const human = this.GetDataHuman();
+//Generate array to show 
+function generateArrayGrid() {
     const dinoDatas = DinoData();
     const dinoArray = [];
-    dinoDatas.forEach(function (dinoData) {
-        const dino = new Dino(dinoData)
+    for (let i = 0; i < dinoDatas.length; i++) {
+        const dino = new Dino(dinoDatas[i])
         dinoArray.push(dino);
-    });
+    }
     dinoArray.splice(4, 0, 'human');
+    return dinoArray;
+}
+// Add tiles to DOM
+function addToDOM() {
+    const human = this.getDataHuman();
+    const arrayGird = this.generateArrayGrid();
     const fragment = document.createDocumentFragment();
     for (let i = 0; i < 9; i++) {
-        let grid = i === 4 ? humanBox(human) : dinoBox(dinoArray[i], i, human);
+        let grid = i === 4 ? humanBox(human) : dinoBox(arrayGird[i], i, human);
         fragment.appendChild(grid);
     }
     document.getElementById('grid').appendChild(fragment);
