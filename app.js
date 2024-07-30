@@ -1,91 +1,26 @@
 function DinoData() {
-    const dinos = [
-        {
-            "species": "Triceratops",
-            "weight": 13000,
-            "height": 114,
-            "diet": "herbivore",
-            "where": "North America",
-            "when": "Late Cretaceous",
-            "fact": "First discovered in 1889 by Othniel Charles Marsh"
-        },
-        {
-            "species": "Tyrannosaurus Rex",
-            "weight": 11905,
-            "height": 144,
-            "diet": "carnivore",
-            "where": "North America",
-            "when": "Late Cretaceous",
-            "fact": "The largest known skull measures in at 5 feet long."
-        },
-        {
-            "species": "Anklyosaurus",
-            "weight": 10500,
-            "height": 55,
-            "diet": "herbivore",
-            "where": "North America",
-            "when": "Late Cretaceous",
-            "fact": "Anklyosaurus survived for approximately 135 million years."
-        },
-        {
-            "species": "Brachiosaurus",
-            "weight": 70000,
-            "height": "372",
-            "diet": "herbivore",
-            "where": "North America",
-            "when": "Late Jurassic",
-            "fact": "An asteroid was named 9954 Brachiosaurus in 1991."
-        },
-        {
-            "species": "Stegosaurus",
-            "weight": 11600,
-            "height": 79,
-            "diet": "herbivore",
-            "where": "North America, Europe, Asia",
-            "when": "Late Jurassic to Early Cretaceous",
-            "fact": "The Stegosaurus had between 17 and 22 seperate plates and flat spines."
-        },
-        {
-            "species": "Elasmosaurus",
-            "weight": 16000,
-            "height": 59,
-            "diet": "carnivore",
-            "where": "North America",
-            "when": "Late Cretaceous",
-            "fact": "Elasmosaurus was a marine reptile first discovered in Kansas."
-        },
-        {
-            "species": "Pteranodon",
-            "weight": 44,
-            "height": 20,
-            "diet": "carnivore",
-            "where": "North America",
-            "when": "Late Cretaceous",
-            "fact": "Actually a flying reptile, the Pteranodon is not a dinosaur."
-        },
-        {
-            "species": "Pigeon",
-            "weight": 0.5,
-            "height": 9,
-            "diet": "herbivore",
-            "where": "Worldwide",
-            "when": "Holocene",
-            "fact": "All birds are living dinosaurs."
-        }
-    ];
-    return dinos;
+    return fetch("/dino.json")
+        .then((res) => res.json())
+        .then((data) => {
+            return data.Dinos.map((dino) => new Dino(dino));
+        }).catch((error) => {
+            console.log(error);
+        })
 }
 
 // Create Dino Constructor
-function Dino(dino) {
-    this.species = dino.species;
-    this.weight = dino.weight;
-    this.height = dino.height;
-    this.diet = dino.diet;
-    this.where = dino.where;
-    this.when = dino.when;
-    this.fact = dino.fact;
+class Dino {
+    constructor(dino) {
+        this.species = dino.species;
+        this.weight = dino.weight;
+        this.height = dino.height;
+        this.diet = dino.diet;
+        this.where = dino.where;
+        this.when = dino.when;
+        this.fact = dino.fact;
+    }
 }
+
 //Method 1
 Dino.prototype.CompareHeight = function CompareHeight(humanHeight) {
     const rate = (this.height / humanHeight).toFixed(1);
@@ -133,20 +68,25 @@ function getDataHuman() {
     const diet = document.getElementById("diet").value;
     const height = Number(feet) * 12 + Number(inches);
     const human = new Human(name ? name : "You", height, weight, diet)
-    console.log(human);
     return human;
 }
 // Generate Tiles for each Dino in Array
 function dinoBox(dinoData, index, human) {
+    const number = Math.floor(Math.random() * (index + 1))
     let compare = "";
+    switch (number) {
+        case 0:
+            compare = dinoData.CompareHeight(human.height);
+            break;
+        case 1:
+            compare = dinoData.CompareWeight(human.weight);
+            break;
+        default:
+            compare = dinoData.CompareDiet(human.diet);
+            break;
+    }
     if (index == 8) {
         compare = "All birds are Dinosaurs."
-    } else if (index % 2 == 0 && index < 5) {
-        compare = dinoData.CompareHeight(human.height);
-    } else if (index % 2 == 1 && index >= 5) {
-        compare = dinoData.CompareWeight(human.weight);
-    } else {
-        compare = dinoData.CompareDiet(human.diet);
     }
     const div = document.createElement('div');
     div.className = 'grid-item';
@@ -164,8 +104,8 @@ function humanBox(human) {
     return div;
 }
 //Generate array to show 
-function generateArrayGrid() {
-    const dinoDatas = DinoData();
+async function generateArrayGrid() {
+    const dinoDatas = await DinoData();
     const dinoArray = [];
     for (let i = 0; i < dinoDatas.length; i++) {
         const dino = new Dino(dinoDatas[i])
@@ -175,9 +115,9 @@ function generateArrayGrid() {
     return dinoArray;
 }
 // Add tiles to DOM
-function addToDOM() {
+async function addToDOM() {
     const human = this.getDataHuman();
-    const arrayGird = this.generateArrayGrid();
+    const arrayGird = await this.generateArrayGrid();
     const fragment = document.createDocumentFragment();
     for (let i = 0; i < 9; i++) {
         let grid = i === 4 ? humanBox(human) : dinoBox(arrayGird[i], i, human);
