@@ -68,6 +68,11 @@ function getDataHuman() {
     const diet = document.getElementById("diet").value;
     const height = Number(feet) * 12 + Number(inches);
     const human = new Human(name ? name : "You", height, weight, diet)
+
+    if (!name || !weight || height == 0) {
+        document.getElementById('error').innerHTML = 'You must enter all fields!';
+        return null;
+    }
     return human;
 }
 // Generate Tiles for each Dino in Array
@@ -86,7 +91,7 @@ function dinoBox(dinoData, index, human) {
             break;
     }
     if (index == 8) {
-        compare = "All birds are Dinosaurs."
+        compare = 'All birds are Dinosaurs.'
     }
     const div = document.createElement('div');
     div.className = 'grid-item';
@@ -117,6 +122,9 @@ async function generateArrayGrid() {
 // Add tiles to DOM
 async function addToDOM() {
     const human = this.getDataHuman();
+    if(!human) return;
+    document.querySelector('form').style.display = 'none';
+    document.getElementById('error').style.display = 'none';
     const arrayGird = await this.generateArrayGrid();
     const fragment = document.createDocumentFragment();
     for (let i = 0; i < 9; i++) {
@@ -127,6 +135,6 @@ async function addToDOM() {
 }
 // On button click, prepare and display infographic
 function btnClick() {
-    document.querySelector('form').style.display = 'none';
+
     this.addToDOM();
 }
